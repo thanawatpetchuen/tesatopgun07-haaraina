@@ -12,89 +12,85 @@ var usersRouter = require('./routes/users');
 var app = express();
 app.use(bodyParser());
 
-// // view engine setup
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'jade');
-
-// app.use(logger('dev'));
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-// app.use(cookieParser());
-// app.use(express.static(path.join(__dirname, 'public')));
-
-// app.use('/', indexRouter);
-// app.use('/users', usersRouter);
-
-// // catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   next(createError(404));
-// });
-
-// // error handler
-// app.use(function(err, req, res, next) {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render('error');
-// });
+var data;
+fs.readFile(__dirname + "/" + "users.json", 'utf8', function (err, data_r) {
+  data = JSON.parse(data_r);
+});
 
 
 app.get('/listUsers', function (req, res) {
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     console.log( data );
-     res.end( data );
-  });
+  // Get all users
+  res.send(data);
+});
+
+app.get('/showbyID/:id', (req, res) => {
+  // Get user by ID
+  var keys = Object.keys(data);
+  var id = req.params['id'];
+  var found = false;
+  var user;
+  for(key in keys){
+    if(data[keys[key]].id == req.params['id']){
+      user = data[keys[key]];
+      found = true;
+    }
+  }
+  if(found){
+    // Found user
+    res.send(user);
+  }else{
+    // User not found
+    res.send("UserID = "+id+" not found");
+  }
 });
 
 
 
-var user = {
-  "user4" : {
-     "name" : "mohit",
-     "password" : "password4",
-     "profession" : "teacher",
-     "id": 4
-  }
-}
-
 app.post('/addUser', function (req, res) {
-  // First read existing users.
-  console.log(req.body);
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
+  // Add user by pass json body data
+  var body = req.body;
+  var keys_data = Object.keys(data);
+  var lastElement = keys_data[keys_data.length-1];
+  var nextUserId = parseInt(lastElement.replace("user", ""))+1
+  var nextUser = "user"+String(nextUserId);
+  body.id = nextUserId;
+  data[nextUser] = body;
+  res.send(data);
+});
 
-     data = JSON.parse( data );
-     data["user4"] = req.body;
-     console.log( data );
-     res.end( JSON.stringify(data));
+app.post('/addMultiUser', (req, res) => {
+  // Add users by pass json body data
+  var body = req.body;
+  body.forEach(user => {
+    var keys_data = Object.keys(data);
+    var lastElement = keys_data[keys_data.length-1];
+    var nextUserId = parseInt(lastElement.replace("user", ""))+1
+    var nextUser = "user"+String(nextUserId);
+    user.id = nextUserId;
+    data[nextUser] = user;
   });
+  res.send(data);
 })
 
-app.get('/:id', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     var users = JSON.parse( data );
-     var user = users["user" + req.params.id] 
-     console.log( user );
-     res.end( JSON.stringify(user));
-  });
+app.delete('/deleteUser/:id', function (req, res) {
+  // Delete user by id
+  var keys = Object.keys(data);
+  var id = req.params['id'];
+  var found = false;
+  for(key in keys){
+    if(data[keys[key]].id == req.params['id']){
+      delete data[keys[key]];
+      found = true;
+    }
+  }
+  if(found){
+    // Found user
+    res.send(data);
+  }else{
+    // User not found
+    res.send("UserID = "+id+" not found");
+  }
 })
-
-var id = 4;
-
-app.delete('/deleteUser', function (req, res) {
-  // First read existing users.
-  fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
-     data = JSON.parse( data );
-     delete data["user" + req.query.id];
-      
-     console.log( data );
-     res.end( JSON.stringify(data));
-  });
-})
-
 
 var server = app.listen(8080, () => {
   console.log(`Server started on port: 8080`);

@@ -49,6 +49,7 @@ app.get('/showbyID/:id', (req, res) => {
 app.post('/addUser', function (req, res) {
   // Add user by pass json body data
   var keys_data = Object.keys(data);
+  var body = req.body;
   var lastElement = keys_data[keys_data.length-1];
   var nextUserId = parseInt(lastElement.replace("user", ""))+1
   var nextUser = "user"+String(nextUserId);

@@ -42,20 +42,14 @@ app.use(bodyParser());
 // });
 
 
-app.get("/hello", function(req, res){
-  res.send("Hello");
-});
-
-app.get("/", (req, res) => {
-  res.send("Sad");
-})
-
 app.get('/listUsers', function (req, res) {
   fs.readFile( __dirname + "/" + "users.json", 'utf8', function (err, data) {
      console.log( data );
      res.end( data );
   });
-})
+});
+
+
 
 var user = {
   "user4" : {

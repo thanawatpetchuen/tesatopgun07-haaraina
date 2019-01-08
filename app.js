@@ -28,10 +28,10 @@ app.get('/showbyID/:id', (req, res) => {
   var keys = Object.keys(data);
   var id = req.params.id;
   var found = false;
-  var user;
+  var user = {};
   for(key in keys){
     if(data[keys[key]].id == id){
-      user = data[keys[key]];
+      user[keys[key]] = data[keys[key]];
       found = true;
     }
   }

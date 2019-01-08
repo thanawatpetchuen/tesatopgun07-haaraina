@@ -26,11 +26,11 @@ app.get('/listUsers', function (req, res) {
 app.get('/showbyID/:id', (req, res) => {
   // Get user by ID
   var keys = Object.keys(data);
-  var id = req.params['id'];
+  var id = req.params.id;
   var found = false;
   var user;
   for(key in keys){
-    if(data[keys[key]].id == req.params['id']){
+    if(data[keys[key]].id == id){
       user = data[keys[key]];
       found = true;
     }

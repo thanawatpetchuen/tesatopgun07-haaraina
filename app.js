@@ -68,16 +68,26 @@ app.post('/addMultiUser', (req, res) => {
   if(Object.keys(body).length == 0){
     res.send("No information given");
     return
-  }
-  body.forEach(user => {
-    var keys_data = Object.keys(data);
+  }else if(Object.keys(body).length == 1){
     var lastElement = keys_data[keys_data.length-1];
     var nextUserId = parseInt(lastElement.replace("user", ""))+1
     var nextUser = "user"+String(nextUserId);
-    user.id = nextUserId;
-    data[nextUser] = user;
-  });
-  res.send(data);
+    body.id = nextUserId;
+    data[nextUser] = body;
+    res.send(data);
+    return;
+  }else{
+    body.forEach(user => {
+      var keys_data = Object.keys(data);
+      var lastElement = keys_data[keys_data.length-1];
+      var nextUserId = parseInt(lastElement.replace("user", ""))+1
+      var nextUser = "user"+String(nextUserId);
+      user.id = nextUserId;
+      data[nextUser] = user;
+    });
+    res.send(data);
+    return;
+  }
 })
 
 app.delete('/deleteUser/:id', function (req, res) {
